@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docs/quick-guide.webp" alt="Pastel Memo 퀵 가이드" />
+</p>
+
+<p align="center">
   <img src="build/icon.png" width="96" alt="Pastel Memo icon" />
 </p>
 
