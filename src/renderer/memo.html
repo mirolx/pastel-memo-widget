@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; font-src 'self' file: data:; style-src 'self' 'unsafe-inline'; script-src 'self'" />
+  <title>메모</title>
+  <link rel="stylesheet" href="memo.css" />
+</head>
+<body>
+  <div class="card" id="card">
+    <header class="head">
+      <div class="left">
+        <button class="ic" id="btnNew" title="옆에 새 메모 (Ctrl+N)">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <button class="ic" id="btnColor" title="색상">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="9" cy="10" r="1.2" class="fill"/><circle cx="14" cy="9" r="1.2" class="fill"/><circle cx="15.5" cy="13.5" r="1.2" class="fill"/></svg>
+        </button>
+        <button class="ic" id="btnOpacity" title="투명도">
+          <svg viewBox="0 0 24 24"><path d="M12 3.5c3 3.6 6 7 6 10.5a6 6 0 0 1-12 0c0-3.5 3-6.9 6-10.5z"/><path d="M12 20a6 6 0 0 0 6-6H6" class="fillsoft"/></svg>
+        </button>
+        <button class="ic" id="btnFont" title="폰트">
+          <svg viewBox="0 0 24 24"><path d="M5 19 10.5 5h1L17 19M7.4 14h7.2"/><path d="M18 9v10"/></svg>
+        </button>
+      </div>
+      <div class="right">
+        <button class="ic" id="btnPin" title="항상 위에 고정">
+          <svg viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v7"/></svg>
+        </button>
+        <button class="ic danger" id="btnDelete" title="메모 삭제">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <textarea id="text" spellcheck="false" placeholder="메모를 입력하세요…"></textarea>
+
+    <!-- popovers -->
+    <div class="pop" id="popColor">
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="pop" id="popOpacity">
+      <div class="row">
+        <span class="lbl">투명도 <small class="hint">· 전체 메모</small></span>
+        <span class="val" id="opVal">90%</span>
+      </div>
+      <input type="range" id="opRange" min="15" max="100" step="1" />
+    </div>
+
+    <div class="pop wide" id="popFont">
+      <div class="row"><span class="lbl">폰트 <small class="hint">· 전체 메모</small></span></div>
+      <select id="fontSel"></select>
+      <div class="row">
+        <span class="lbl">크기</span>
+        <span class="val" id="sizeVal">15px</span>
+      </div>
+      <input type="range" id="sizeRange" min="10" max="36" step="1" />
+      <div class="btns">
+        <button class="pill" id="btnRegister">＋ 폰트 등록</button>
+      </div>
+      <div class="fontlist" id="fontList"></div>
+    </div>
+
+    <div class="confirm" id="confirm">
+      <span>이 메모를 삭제할까요?</span>
+      <div class="btns">
+        <button class="pill ghost" id="cNo">취소</button>
+        <button class="pill warn" id="cYes">삭제</button>
+      </div>
+    </div>
+
+    <div class="grip" id="grip" title="크기 조절"></div>
+  </div>
+  <script src="memo.js"></script>
+</body>
+</html>

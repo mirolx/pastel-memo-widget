@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'self'" />
+  <title>메모 토글</title>
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; background: transparent; overflow: hidden; user-select: none; }
+    body { display: grid; place-items: center; }
+    button {
+      width: 38px; height: 38px; border: 0; border-radius: 50%;
+      display: grid; place-items: center; cursor: pointer;
+      background: linear-gradient(135deg, #D4A5A5, #B8ACCC);
+      box-shadow: 0 2px 6px rgba(60, 30, 50, .25), inset 0 0 0 1.5px rgba(255,255,255,.7);
+      color: #4a3236;
+      transition: transform .18s ease, background .25s ease, opacity .25s ease;
+      opacity: .85;
+    }
+    button:hover { transform: scale(1.08); opacity: 1; }
+    button:active { transform: scale(.94); }
+    button.off { background: linear-gradient(135deg, #e9e4ea, #d9d4dc); opacity: .6; }
+    svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .eye-off { display: none; }
+    button.off .eye-on { display: none; }
+    button.off .eye-off { display: block; }
+  </style>
+</head>
+<body>
+  <button id="b" title="클릭: 메모 숨기기/보이기 · 우클릭: 새 메모">
+    <svg class="eye-on" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>
+    <svg class="eye-off" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3"/><path d="M3 3l18 18"/></svg>
+  </button>
+  <script src="toggle.js"></script>
+</body>
+</html>
