@@ -92,6 +92,7 @@ function createMemoWindow(memo) {
     store.updateMemo(memo.id, { x: b.x, y: b.y, width: b.width, height: b.height });
   };
   win.on('moved', saveBounds);
+  win.on('session-end', () => store.flush());   // Windows log-off / shutdown
   win.on('closed', () => memoWindows.delete(memo.id));
   memoWindows.set(memo.id, win);
   return win;
@@ -194,6 +195,7 @@ function createToggleWindow() {
     },
   });
   toggleWin.setAlwaysOnTop(true, 'screen-saver');
+  toggleWin.on('session-end', () => store.flush());
   toggleWin.loadFile(path.join(__dirname, 'renderer', 'toggle.html'));
 }
 
@@ -227,8 +229,9 @@ function refreshTrayMenu() {
     },
     {
       label: 'Windows 시작 시 실행', type: 'checkbox',
-      checked: app.getLoginItemSettings().openAtLogin,
-      click: (i) => app.setLoginItemSettings({ openAtLogin: i.checked }),
+      checked: store.get().autoStart !== false,
+      enabled: app.isPackaged,
+      click: (i) => { store.set({ autoStart: i.checked }); applyAutoStart(); },
     },
     { type: 'separator' },
     { label: '종료', click: () => app.quit() },
@@ -312,12 +315,21 @@ ipcMain.on('toggle:click', toggleAll);
 ipcMain.on('toggle:new', () => newMemo());
 ipcMain.handle('toggle:state', () => store.get().hidden);
 
+// ---------- auto-start at Windows login (on by default) ----------
+// The portable build runs from a temp folder, so register the .exe the user actually launched.
+const launchPath = () => process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
+function applyAutoStart() {
+  if (!app.isPackaged) return;   // dev runs would register electron.exe itself
+  app.setLoginItemSettings({ openAtLogin: store.get().autoStart !== false, path: launchPath() });
+}
+
 // ---------- lifecycle ----------
 app.on('second-instance', () => setHidden(false));
 
 app.whenReady().then(() => {
   app.setAppUserModelId('pastel.memo.widget');
   store.load(path.join(app.getPath('userData'), 'memos.json'));
+  applyAutoStart();   // re-register every launch so a moved/updated exe keeps auto-starting
 
   createToggleWindow();
   if (store.get().toggleVisible === false) toggleWin.hide();

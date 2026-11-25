@@ -218,12 +218,10 @@ api.onStyleSync((p) => {
   if ('font' in p || 'fontSize' in p) applyFont();
 });
 
-// text autosave (debounced)
-let tt = null;
+// text autosave: send every change right away; the main process batches the disk write
 $('text').addEventListener('input', (e) => {
   memo.text = e.target.value;
-  clearTimeout(tt);
-  tt = setTimeout(() => api.update(id, { text: memo.text }), 250);
+  api.update(id, { text: memo.text });
 });
 window.addEventListener('beforeunload', () => api.update(id, { text: memo.text }));
 
