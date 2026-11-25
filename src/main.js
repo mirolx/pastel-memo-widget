@@ -5,6 +5,7 @@ const {
 const path = require('path');
 const fs = require('fs');
 const { pathToFileURL } = require('url');
+const { execFile } = require('child_process');
 const store = require('./store');
 
 const PAD = 6;            // transparent padding around the card (for the shadow)
@@ -317,10 +318,22 @@ ipcMain.handle('toggle:state', () => store.get().hidden);
 
 // ---------- auto-start at Windows login (on by default) ----------
 // The portable build runs from a temp folder, so register the .exe the user actually launched.
+//
+// Written straight to the Run key instead of app.setLoginItemSettings: Electron stores the
+// path unquoted, and Windows splits "…\Pastel Memo.exe" at the space at login, so it never ran.
 const launchPath = () => process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
-function applyAutoStart() {
+const RUN_KEY = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run';
+const RUN_NAME = 'Pastel Memo';
+const reg = (args) => new Promise((res) => execFile('reg', args, { windowsHide: true }, (err) => res(!err)));
+
+async function applyAutoStart() {
   if (!app.isPackaged) return;   // dev runs would register electron.exe itself
-  app.setLoginItemSettings({ openAtLogin: store.get().autoStart !== false, path: launchPath() });
+  await reg(['delete', RUN_KEY, '/v', 'pastel.memo.widget', '/f']);   // old unquoted entry (v1.0.1)
+  if (store.get().autoStart !== false) {
+    await reg(['add', RUN_KEY, '/v', RUN_NAME, '/t', 'REG_SZ', '/d', `"${launchPath()}"`, '/f']);
+  } else {
+    await reg(['delete', RUN_KEY, '/v', RUN_NAME, '/f']);
+  }
 }
 
 // ---------- lifecycle ----------
@@ -330,6 +343,7 @@ app.whenReady().then(() => {
   app.setAppUserModelId('pastel.memo.widget');
   store.load(path.join(app.getPath('userData'), 'memos.json'));
   applyAutoStart();   // re-register every launch so a moved/updated exe keeps auto-starting
+  store.set({ hidden: false });   // always open with memos showing (e.g. after a reboot)
 
   createToggleWindow();
   if (store.get().toggleVisible === false) toggleWin.hide();
