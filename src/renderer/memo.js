@@ -40,6 +40,7 @@ const BUILTIN_FONTS = [
 
 let memo = null;
 let customFonts = [];      // [{family, url}]
+let fontsReady = false;    // true once the registered font list has arrived from main
 const loadedFonts = new Set();
 
 // ---------- apply ----------
@@ -81,6 +82,7 @@ function applyFont() {
 
 async function loadCustomFonts(list) {
   customFonts = list;
+  fontsReady = true;
   await Promise.all(list.map(async (f) => {
     if (loadedFonts.has(f.url)) return;
     try {
@@ -108,10 +110,14 @@ function renderFontOptions() {
     });
     sel.append(g2);
   }
-  // fall back if the selected custom font was removed
-  if (![...sel.options].some((o) => o.value === memo.font)) {
+  const known = [...sel.options].some((o) => o.value === memo.font);
+  if (!known && fontsReady) {
+    // the selected custom font was really removed → fall back for everyone
     memo.font = 'default';
     api.syncStyle({ font: memo.font });
+  } else if (!known) {
+    // registered fonts not loaded yet: keep the saved choice, just show it
+    sel.append(new Option(memo.font, memo.font));
   }
   sel.value = memo.font;
   applyFont();

@@ -1,7 +1,7 @@
 {
   "name": "pastel-memo-widget",
   "productName": "Pastel Memo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "파스텔 톤 데스크톱 메모 위젯",
   "main": "src/main.js",
   "scripts": {
